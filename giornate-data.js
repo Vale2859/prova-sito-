@@ -20,7 +20,7 @@ window.GiornateData = [
     "🎁 Omaggi esclusivi",
     "💄 Consigli personalizzati"
   ],
-  attiva: false
+  attiva: true
 },
 
 /* =========================
