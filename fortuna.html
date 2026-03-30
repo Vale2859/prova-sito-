@@ -231,14 +231,14 @@
       filter:drop-shadow(0 4px 6px rgba(0,0,0,0.12));
     }
 
-    .gift.g1{ transform:rotate(0deg) translate(102px, -18px) rotate(22deg); }
-    .gift.g2{ transform:rotate(45deg) translate(102px, -18px) rotate(-24deg); }
-    .gift.g3{ transform:rotate(90deg) translate(102px, -18px) rotate(22deg); }
-    .gift.g4{ transform:rotate(135deg) translate(102px, -18px) rotate(-24deg); }
-    .gift.g5{ transform:rotate(180deg) translate(102px, -18px) rotate(22deg); }
-    .gift.g6{ transform:rotate(225deg) translate(102px, -18px) rotate(-24deg); }
-    .gift.g7{ transform:rotate(270deg) translate(102px, -18px) rotate(22deg); }
-    .gift.g8{ transform:rotate(315deg) translate(102px, -18px) rotate(-24deg); }
+    .gift.g1{ transform:rotate(0deg) translate(90px, -14px) rotate(22deg); }
+    .gift.g2{ transform:rotate(45deg) translate(90px, -14px) rotate(-24deg); }
+    .gift.g3{ transform:rotate(90deg) translate(90px, -14px) rotate(22deg); }
+    .gift.g4{ transform:rotate(135deg) translate(90px, -14px) rotate(-24deg); }
+    .gift.g5{ transform:rotate(180deg) translate(90px, -14px) rotate(22deg); }
+    .gift.g6{ transform:rotate(225deg) translate(90px, -14px) rotate(-24deg); }
+    .gift.g7{ transform:rotate(270deg) translate(90px, -14px) rotate(22deg); }
+    .gift.g8{ transform:rotate(315deg) translate(90px, -14px) rotate(-24deg); }
 
     .timer-card{
       margin-top:18px;
@@ -434,18 +434,18 @@
         font-size:1.7rem;
       }
       .gift{
-        width:42px;
-        height:42px;
-        font-size:1.8rem;
+        width:34px;
+        height:34px;
+        font-size:1.45rem;
       }
-      .gift.g1{ transform:rotate(0deg) translate(93px, -17px) rotate(22deg); }
-      .gift.g2{ transform:rotate(45deg) translate(93px, -17px) rotate(-24deg); }
-      .gift.g3{ transform:rotate(90deg) translate(93px, -17px) rotate(22deg); }
-      .gift.g4{ transform:rotate(135deg) translate(93px, -17px) rotate(-24deg); }
-      .gift.g5{ transform:rotate(180deg) translate(93px, -17px) rotate(22deg); }
-      .gift.g6{ transform:rotate(225deg) translate(93px, -17px) rotate(-24deg); }
-      .gift.g7{ transform:rotate(270deg) translate(93px, -17px) rotate(22deg); }
-      .gift.g8{ transform:rotate(315deg) translate(93px, -17px) rotate(-24deg); }
+      .gift.g1{ transform:rotate(0deg) translate(82px, -12px) rotate(22deg); }
+      .gift.g2{ transform:rotate(45deg) translate(82px, -12px) rotate(-24deg); }
+      .gift.g3{ transform:rotate(90deg) translate(82px, -12px) rotate(22deg); }
+      .gift.g4{ transform:rotate(135deg) translate(82px, -12px) rotate(-24deg); }
+      .gift.g5{ transform:rotate(180deg) translate(82px, -12px) rotate(22deg); }
+      .gift.g6{ transform:rotate(225deg) translate(82px, -12px) rotate(-24deg); }
+      .gift.g7{ transform:rotate(270deg) translate(82px, -12px) rotate(22deg); }
+      .gift.g8{ transform:rotate(315deg) translate(82px, -12px) rotate(-24deg); }
     }
   </style>
   <link rel="stylesheet" href="app-fixes.css" />
@@ -533,6 +533,7 @@
     </div>
   </div>
 
+  <script src="punti.js"></script>
   <script>
     const defaultFortunaData = {
       lastPlayDate: null,
@@ -669,6 +670,55 @@
       return 360 - segmentCenter;
     }
 
+
+    function syncPointsTotals(nextPoints) {
+      try {
+        const pointsRaw = localStorage.getItem("farmaciaPuntiData");
+        const pointsData = pointsRaw ? JSON.parse(pointsRaw) : {};
+        pointsData.points = Number(nextPoints || 0);
+        pointsData.level = typeof calcolaLivello === "function" ? calcolaLivello(pointsData.points) : (pointsData.level || "Bronze");
+        pointsData.missing = pointsData.points >= 3000 ? 0 : (pointsData.points >= 1000 ? Math.max(0, 3000 - pointsData.points) : Math.max(0, 1000 - pointsData.points));
+        localStorage.setItem("farmaciaPuntiData", JSON.stringify(pointsData));
+      } catch(e){}
+    }
+
+    function awardFortunaPrize(result) {
+      if (!result || !result.won) return;
+      const match = String(result.prize || "").match(/(\d+)\s*punti/i);
+      if (match && typeof aggiungiAcquisto === "function") {
+        const bonus = Number(match[1] || 0);
+        if (bonus > 0) {
+          let profile = {};
+          try { profile = JSON.parse(localStorage.getItem("farmaciaProfileData") || "{}"); } catch(e){}
+          let pointsData = {};
+          try { pointsData = JSON.parse(localStorage.getItem("farmaciaPuntiData") || "{}"); } catch(e){}
+          const currentPoints = Number(profile.points ?? pointsData.points ?? 0);
+          const nextPoints = currentPoints + bonus;
+          profile.points = nextPoints;
+          if (typeof calcolaLivello === "function") profile.level = calcolaLivello(nextPoints);
+          pointsData.points = nextPoints;
+          pointsData.level = profile.level || pointsData.level || "Bronze";
+          pointsData.missing = nextPoints >= 3000 ? 0 : (nextPoints >= 1000 ? Math.max(0, 3000 - nextPoints) : Math.max(0, 1000 - nextPoints));
+          pointsData.activities = Array.isArray(pointsData.activities) ? pointsData.activities : [];
+          pointsData.operations = Array.isArray(pointsData.operations) ? pointsData.operations : [];
+          pointsData.activities.unshift({ label: "Bonus Fortuna", points: bonus, date: new Date().toLocaleDateString("it-IT") });
+          pointsData.operations.unshift({ name: "Bonus Fortuna", meta: `${new Date().toLocaleDateString("it-IT")} • ${result.prize}`, points: bonus, icon: "🍀" });
+          localStorage.setItem("farmaciaProfileData", JSON.stringify(profile));
+          localStorage.setItem("farmaciaPuntiData", JSON.stringify(pointsData));
+        }
+        return;
+      }
+
+      try {
+        let pointsData = JSON.parse(localStorage.getItem("farmaciaPuntiData") || "{}");
+        pointsData.activities = Array.isArray(pointsData.activities) ? pointsData.activities : [];
+        pointsData.operations = Array.isArray(pointsData.operations) ? pointsData.operations : [];
+        pointsData.activities.unshift({ label: "Premio Fortuna", points: 0, date: new Date().toLocaleDateString("it-IT") });
+        pointsData.operations.unshift({ name: "Premio Fortuna", meta: `${new Date().toLocaleDateString("it-IT")} • ${result.prize || 'Premio sorpresa'}`, points: 0, icon: "🎁" });
+        localStorage.setItem("farmaciaPuntiData", JSON.stringify(pointsData));
+      } catch(e){}
+    }
+
     function playFortune() {
       if (isSpinning) return;
       if (hasPlayedToday()) return;
@@ -691,6 +741,7 @@
         lastPlayDate: getTodayKey(),
         lastResult: result
       });
+      awardFortunaPrize(result);
 
       updatePlayState();
       updateCountdown();
