@@ -784,7 +784,7 @@
               <img
                 src="${CONFIG.extraCardImages.punti}"
                 alt="Fidelity"
-                onerror="this.onerror=null;this.src='images/promo.jpg';"
+                onerror="this.onerror=null;this.src='images/fidelity.jpg';"
               >
               <div class="mobile-preview-card-content">
                 <h3 class="mobile-preview-card-title">Fidelity</h3>
