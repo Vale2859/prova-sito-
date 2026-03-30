@@ -16,7 +16,7 @@ window.PromoData = [
   prezzoNuovo: "€8,90",
   dataInizio: "2026-03-01",
   dataFine: "2026-03-31",
-  attiva: false
+  attiva: true
 },
 
 /* =========================
@@ -138,7 +138,7 @@ window.PromoData = [
   prezzoNuovo: "€11,90",
   dataInizio: "2026-03-01",
   dataFine: "2026-03-31",
-  attiva: false
+  attiva: true
 },
 
 {
@@ -152,7 +152,7 @@ window.PromoData = [
   prezzoNuovo: "€8,90",
   dataInizio: "2026-03-01",
   dataFine: "2026-03-31",
-  attiva: false
+  attiva: true
 },
 
 {
@@ -166,7 +166,7 @@ window.PromoData = [
   prezzoNuovo: "€14,90",
   dataInizio: "2026-03-01",
   dataFine: "2026-03-31",
-  attiva: false
+  attiva: true
 },
 
 {
@@ -180,7 +180,7 @@ window.PromoData = [
   prezzoNuovo: "€18,90",
   dataInizio: "2026-03-01",
   dataFine: "2026-03-31",
-  attiva: false
+  attiva: true
 },
 
 {
@@ -194,7 +194,7 @@ window.PromoData = [
   prezzoNuovo: "€16,90",
   dataInizio: "2026-03-01",
   dataFine: "2026-03-31",
-  attiva: false
+  attiva: true
 },
 
 {
@@ -208,7 +208,7 @@ window.PromoData = [
   prezzoNuovo: "€13,90",
   dataInizio: "2026-03-01",
   dataFine: "2026-03-31",
-  attiva: false
+  attiva: true
 }
 
 ];
