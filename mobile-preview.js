@@ -820,7 +820,7 @@
               <img
                 src="${CONFIG.extraCardImages.profilo}"
                 alt="Profilo"
-                onerror="this.onerror=null;this.src='images/promo.jpg';"
+                onerror="this.onerror=null;this.src='images/profilo.jpg';"
               >
               <div class="mobile-preview-card-content">
                 <h3 class="mobile-preview-card-title">Profilo</h3>
