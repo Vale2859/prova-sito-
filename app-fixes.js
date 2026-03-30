@@ -11,13 +11,43 @@
   if(path==='servizi.html') body.classList.add('page-servizi');
   if(path==='fortuna.html') body.classList.add('page-fortuna');
 
+
+  function enforceLogoOnlyHeader(){
+    const headers = document.querySelectorAll('.home-site-header, header');
+    headers.forEach((header)=>{
+      const nav = header.querySelector('.home-desktop-nav');
+      const actions = header.querySelector('.home-nav-actions');
+      if (nav) nav.remove();
+      if (actions) actions.remove();
+      const wrap = header.querySelector('.home-shell.home-nav-wrap, .home-nav-wrap');
+      if (wrap) {
+        wrap.style.display = 'flex';
+        wrap.style.justifyContent = 'center';
+        wrap.style.alignItems = 'center';
+        wrap.style.gap = '0';
+      }
+      const brand = header.querySelector('.home-brand');
+      if (brand) {
+        brand.style.margin = '0 auto';
+        brand.style.display = 'flex';
+        brand.style.justifyContent = 'center';
+      }
+    });
+  }
+
   function parseUser(){
     try{return JSON.parse(localStorage.getItem('farmaciaCurrentUser')||'null');}catch(e){return null;}
+  }
+
+  if(['turno.html','giornate.html','promo.html','servizi.html'].includes(path)){
+    enforceLogoOnlyHeader();
   }
 
   if(path==='turno.html'){
     const side=document.querySelector('.hero-side');
     if(side) side.remove();
+    const hero=document.querySelector('.hero-top');
+    if(hero) hero.remove();
     const kicker=document.querySelector('.page-kicker');
     if(kicker) kicker.textContent='Farmacie di turno a Matera';
   }
@@ -25,8 +55,13 @@
   if(path==='servizi.html'){
     const badge=document.querySelector('.focus-badge');
     const title=document.querySelector('.focus-copy h2');
+    const focusCard=document.querySelector('.focus-card');
     if(badge) badge.textContent='Servizio del momento';
     if(title) title.textContent='TRICO';
+    if(focusCard){
+      const p=focusCard.querySelector('p');
+      if(p) p.remove();
+    }
   }
 
   if(path==='index.html'){

@@ -96,3 +96,9 @@ body.page-fortuna .wheel-outer{
     visibility:hidden;
   }
 }
+
+
+body.page-logo-only .home-site-header{padding-top:14px !important;}
+body.page-logo-only .home-brand-logo-box{display:flex !important;justify-content:center !important;align-items:center !important;}
+body.page-logo-only .home-brand-logo-box img{height:62px !important;width:auto !important;max-width:190px !important;}
+body.page-servizi .focus-copy h2{font-size:1rem !important;letter-spacing:.08em !important;}
