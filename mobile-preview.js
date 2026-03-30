@@ -648,12 +648,12 @@
       </div>
     </div>
 
-    <a href="${CONFIG.miaLink}" class="mobile-preview-hero" aria-label="Apri assistente Mia">
+    <a href="${CONFIG.miaLink}" class="mobile-preview-hero" id="mobilePreviewHero" aria-label="Apri assistente Mia">
       <div class="mobile-preview-hero-bg"></div>
 
-      <div class="mobile-preview-bubble">
-        <h2 class="mobile-preview-bubble-title">Ciao, sono MIA❤️❤️</h2>
-        <p class="mobile-preview-bubble-subtitle">Ti aiuto a prenotare<br>esami e servizi in farmacia</p>
+      <div class="mobile-preview-bubble" id="mobilePreviewBubble">
+        <h2 class="mobile-preview-bubble-title" id="mobilePreviewBubbleTitle">Ciao, sono MIA❤️❤️</h2>
+        <p class="mobile-preview-bubble-subtitle" id="mobilePreviewBubbleSubtitle">Ti aiuto a prenotare<br>esami e servizi in farmacia</p>
       </div>
 
       <div class="mobile-preview-mia">
@@ -881,6 +881,68 @@
       openPrivateModal();
     });
   });
+
+
+  (function setupMobileMiaBubble() {
+    const hero = document.getElementById('mobilePreviewHero');
+    const bubble = document.getElementById('mobilePreviewBubble');
+    const title = document.getElementById('mobilePreviewBubbleTitle');
+    const subtitle = document.getElementById('mobilePreviewBubbleSubtitle');
+    if (!hero || !bubble || !title || !subtitle) return;
+
+    const isLogged = localStorage.getItem('farmaciaLoggedIn') === 'true';
+    let user = null;
+    try { user = JSON.parse(localStorage.getItem('farmaciaCurrentUser') || 'null'); } catch (e) { user = null; }
+    const firstName = user && (user.name || user.nome) ? String(user.name || user.nome).trim().split(/\s+/)[0] : '';
+    const seenInitial = sessionStorage.getItem('mobileMiaSeenInitial') === 'true';
+
+    let hideTimer = null;
+    function renderMessage(kind) {
+      if (kind === 'return') {
+        title.textContent = isLogged ? `Bentornato ${firstName || 'cliente'} ❤️` : 'Hai bisogno di altro?';
+        subtitle.innerHTML = 'Per altri bisogni puoi contattarmi quando vuoi';
+      } else {
+        title.textContent = isLogged ? `Ciao ${firstName || 'cliente'}, sono MIA❤️❤️` : 'Ciao, sono MIA❤️❤️';
+        subtitle.innerHTML = 'Ti aiuto a prenotare<br>esami e servizi in farmacia';
+      }
+    }
+    function showBubble(kind) {
+      clearTimeout(hideTimer);
+      renderMessage(kind);
+      bubble.style.opacity = '1';
+      bubble.style.transform = 'translateY(0) scale(1)';
+      hideTimer = setTimeout(() => {
+        bubble.style.opacity = '0';
+        bubble.style.transform = 'translateY(8px) scale(.98)';
+      }, 5000);
+    }
+    bubble.style.transition = 'opacity .28s ease, transform .28s ease';
+    bubble.style.opacity = '0';
+    bubble.style.transform = 'translateY(8px) scale(.98)';
+
+    setTimeout(() => {
+      showBubble(seenInitial ? 'return' : 'intro');
+      sessionStorage.setItem('mobileMiaSeenInitial', 'true');
+    }, 650);
+
+    hero.addEventListener('click', function() {
+      sessionStorage.setItem('mobileMiaReturnPending', 'true');
+    });
+
+    window.addEventListener('pageshow', function() {
+      if (sessionStorage.getItem('mobileMiaReturnPending') === 'true') {
+        sessionStorage.removeItem('mobileMiaReturnPending');
+        setTimeout(() => showBubble('return'), 500);
+      }
+    });
+
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden && sessionStorage.getItem('mobileMiaReturnPending') === 'true') {
+        sessionStorage.removeItem('mobileMiaReturnPending');
+        setTimeout(() => showBubble('return'), 300);
+      }
+    });
+  })();
 
   (function updateOpeningStatus() {
     const dot = document.getElementById("mobilePreviewStatusDot");
