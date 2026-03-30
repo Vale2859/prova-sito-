@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Operatore | Farmacia Montesano</title>
+  <style>
+    :root{
+      --bg:#f3f4f1;
+      --panel:#f7f6f2;
+      --card:#ffffff;
+      --text:#24322d;
+      --text-soft:#6f7b74;
+      --green-dark:#55655d;
+      --green-mid:#708176;
+      --green-light:#eef1eb;
+      --gold:#cbb27a;
+      --gold-2:#e0d0a2;
+      --line:#d9ddd7;
+      --shadow:0 18px 34px rgba(28,38,33,0.10);
+      --radius-xl:28px;
+      --radius-lg:22px;
+      --radius-md:16px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family: Inter, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, #fafaf7 0%, #f2f4f0 45%, #ecefe9 100%);
+      color:var(--text);
+      min-height:100vh;
+    }
+
+    button,input{
+      font-family:inherit;
+    }
+
+    .page{
+      width:min(1600px, calc(100% - 48px));
+      margin:26px auto 40px;
+    }
+
+    .operator-shell{
+      background:linear-gradient(180deg, #f9faf7 0%, #f2f3ee 100%);
+      border:1px solid #dde2dc;
+      border-radius:34px;
+      box-shadow:0 26px 54px rgba(20,28,24,0.12);
+      overflow:hidden;
+    }
+
+    .topbar{
+      background:
+        radial-gradient(circle at right top, rgba(224,208,162,0.35) 0%, rgba(224,208,162,0) 40%),
+        linear-gradient(135deg, #4e5d56 0%, #65766c 100%);
+      padding:22px 28px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+    }
+
+    .operator-active{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      min-width:0;
+    }
+
+    .operator-avatar{
+      width:72px;
+      height:72px;
+      border-radius:50%;
+      background:rgba(255,255,255,0.78);
+      color:#2d3c36;
+      display:grid;
+      place-items:center;
+      font-size:2rem;
+      font-weight:900;
+      flex:0 0 72px;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,0.45);
+    }
+
+    .operator-copy{
+      min-width:0;
+    }
+
+    .operator-label{
+      margin:0 0 6px;
+      color:rgba(255,255,255,0.78);
+      font-size:13px;
+      font-weight:700;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .operator-name{
+      margin:0;
+      color:#fff;
+      font-size:2rem;
+      line-height:1;
+      font-weight:900;
+      letter-spacing:-0.04em;
+    }
+
+    .operator-badge{
+      margin:8px 0 0;
+      color:rgba(255,255,255,0.86);
+      font-size:1rem;
+      font-weight:600;
+    }
+
+    .topbar-actions{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .top-btn{
+      min-height:50px;
+      padding:0 18px;
+      border:none;
+      border-radius:18px;
+      background:rgba(255,255,255,0.88);
+      color:#27352f;
+      font-size:15px;
+      font-weight:800;
+      cursor:pointer;
+      box-shadow:0 10px 20px rgba(0,0,0,0.08);
+      white-space:nowrap;
+    }
+
+    .content{
+      padding:34px 34px 40px;
+    }
+
+    .main-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:18px;
+      margin-bottom:18px;
+    }
+
+    .field-card{
+      background:linear-gradient(180deg,#fdfdfa 0%, #f7f7f3 100%);
+      border:2px solid var(--gold-2);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .field-card.split-dark .field-head{
+      background:linear-gradient(135deg,#5b6a62 0%, #6f8076 100%);
+      color:#fff;
+    }
+
+    .field-card.split-light .field-head{
+      background:linear-gradient(180deg,#faf8f1 0%, #f6f2e7 100%);
+      color:#38453f;
+    }
+
+    .field-head{
+      padding:16px 18px 10px;
+      font-size:1.05rem;
+      font-weight:900;
+      letter-spacing:-0.02em;
+    }
+
+    .field-body{
+      padding:14px 16px 16px;
+      background:#fff;
+    }
+
+    .money-input-wrap,
+    .extra-input-wrap{
+      position:relative;
+    }
+
+    .money-symbol{
+      position:absolute;
+      left:18px;
+      top:50%;
+      transform:translateY(-50%);
+      font-size:2rem;
+      color:#45524c;
+      pointer-events:none;
+      font-weight:700;
+    }
+
+    .money-input{
+      width:100%;
+      min-height:80px;
+      border:1.5px solid var(--line);
+      border-radius:18px;
+      padding:0 22px 0 64px;
+      font-size:2rem;
+      font-weight:800;
+      color:#32403a;
+      background:#fbfbf8;
+      outline:none;
+      text-align:right;
+    }
+
+    .money-input:focus,
+    .extra-input:focus,
+    .extra-reason:focus,
+    .client-search-input:focus,
+    .operator-badge-input:focus,
+    .operator-manage-input:focus{
+      border-color:#b8c8bf;
+      box-shadow:0 0 0 4px rgba(108,132,119,0.10);
+    }
+
+    .extra-input{
+      width:100%;
+      min-height:80px;
+      border:1.5px solid var(--line);
+      border-radius:18px;
+      padding:0 74px 0 20px;
+      font-size:2rem;
+      font-weight:800;
+      color:#32403a;
+      background:#fbfbf8;
+      outline:none;
+    }
+
+    .extra-plus{
+      position:absolute;
+      right:14px;
+      top:50%;
+      transform:translateY(-50%);
+      width:52px;
+      height:52px;
+      border-radius:14px;
+      border:none;
+      background:linear-gradient(180deg,#d7be84 0%, #c5aa6b 100%);
+      color:#fff;
+      font-size:2rem;
+      font-weight:900;
+      cursor:default;
+      box-shadow:0 8px 16px rgba(197,170,107,0.22);
+    }
+
+    .extra-reason{
+      width:100%;
+      margin-top:12px;
+      min-height:56px;
+      border:1.5px solid var(--line);
+      border-radius:16px;
+      padding:0 16px;
+      font-size:1rem;
+      font-weight:600;
+      color:#32403a;
+      background:#fbfbf8;
+      outline:none;
+    }
+
+    .client-search-card{
+      background:linear-gradient(135deg,#5c6a62 0%, #707f76 100%);
+      border:2px solid var(--gold-2);
+      border-radius:26px;
+      box-shadow:var(--shadow);
+      padding:14px;
+      margin-bottom:18px;
+    }
+
+    .client-search-inner{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      background:#fbfbf8;
+      border-radius:18px;
+      min-height:86px;
+      padding:0 18px;
+      border:1px solid rgba(0,0,0,0.06);
+    }
+
+    .client-search-icon{
+      width:44px;
+      height:44px;
+      display:grid;
+      place-items:center;
+      font-size:1.6rem;
+      color:#58665f;
+      flex:0 0 44px;
+    }
+
+    .client-search-input{
+      flex:1;
+      min-width:0;
+      border:none;
+      background:transparent;
+      min-height:60px;
+      font-size:1.45rem;
+      font-weight:600;
+      color:#32403a;
+      outline:none;
+    }
+
+    .client-search-btn{
+      width:58px;
+      height:58px;
+      border-radius:16px;
+      border:none;
+      background:linear-gradient(180deg,#f6f2e7 0%, #efe7d4 100%);
+      color:#55625b;
+      font-size:1.8rem;
+      font-weight:900;
+      cursor:pointer;
+      box-shadow:0 8px 16px rgba(0,0,0,0.06);
+      flex:0 0 58px;
+    }
+
+    .client-preview{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+      background:#fff;
+      border:1px solid #e2e7e1;
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:20px 22px;
+      margin-bottom:18px;
+    }
+
+    .client-preview-left{
+      min-width:0;
+      flex:1;
+    }
+
+    .client-preview-label{
+      margin:0 0 7px;
+      color:var(--text-soft);
+      font-size:13px;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+
+    .client-preview-name{
+      margin:0;
+      font-size:1.75rem;
+      line-height:1;
+      font-weight:900;
+      letter-spacing:-0.04em;
+    }
+
+    .client-preview-meta{
+      margin:8px 0 0;
+      color:var(--text-soft);
+      font-size:15px;
+      font-weight:600;
+      line-height:1.45;
+    }
+
+    .client-preview-right{
+      text-align:right;
+      flex:0 0 auto;
+    }
+
+    .client-points-label{
+      margin:0 0 6px;
+      color:var(--text-soft);
+      font-size:13px;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+
+    .client-points-value{
+      margin:0;
+      font-size:2rem;
+      line-height:1;
+      font-weight:900;
+      color:#34423c;
+      letter-spacing:-0.05em;
+    }
+
+    .client-level-pill{
+      display:inline-flex;
+      margin-top:10px;
+      min-height:34px;
+      align-items:center;
+      justify-content:center;
+      padding:0 14px;
+      border-radius:999px;
+      background:#f2f5f1;
+      border:1px solid #dde4de;
+      color:#56645d;
+      font-size:13px;
+      font-weight:900;
+    }
+
+    .bottom-bar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+      background:#fff;
+      border:1px solid #e2e7e1;
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:18px 22px;
+    }
+
+    .bottom-summary{
+      display:flex;
+      gap:26px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .summary-item{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+
+    .summary-label{
+      color:var(--text-soft);
+      font-size:12px;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+
+    .summary-value{
+      font-size:1.4rem;
+      font-weight:900;
+      color:#32403a;
+      letter-spacing:-0.03em;
+    }
+
+    .send-btn{
+      min-width:280px;
+      min-height:82px;
+      border:none;
+      border-radius:22px;
+      background:linear-gradient(135deg,#596860 0%, #738379 100%);
+      color:#fff;
+      font-size:2rem;
+      font-weight:900;
+      letter-spacing:-0.04em;
+      cursor:pointer;
+      box-shadow:0 16px 30px rgba(56,68,61,0.18);
+    }
+
+    .notice{
+      margin-top:16px;
+      padding:14px 16px;
+      border-radius:16px;
+      font-size:14px;
+      line-height:1.45;
+      font-weight:700;
+    }
+
+    .notice.warn{
+      background:#fff7e8;
+      color:#9a6a17;
+      border:1px solid #efd89f;
+    }
+
+    .notice.ok{
+      background:#eef7f1;
+      color:#356350;
+      border:1px solid #cfe3d8;
+    }
+
+    .overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(18,24,21,0.72);
+      backdrop-filter:blur(8px);
+      -webkit-backdrop-filter:blur(8px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      z-index:9999;
+    }
+
+    .overlay.hidden{
+      display:none;
+    }
+
+    .overlay-card{
+      width:min(100%, 520px);
+      background:#fff;
+      border-radius:28px;
+      box-shadow:0 28px 56px rgba(0,0,0,0.18);
+      padding:24px;
+    }
+
+    .overlay-title{
+      margin:0 0 10px;
+      font-size:2rem;
+      line-height:1;
+      font-weight:900;
+      letter-spacing:-0.04em;
+    }
+
+    .overlay-text{
+      margin:0 0 16px;
+      color:var(--text-soft);
+      font-size:15px;
+      line-height:1.55;
+      font-weight:600;
+    }
+
+    .operator-badge-input,
+    .operator-manage-input{
+      width:100%;
+      min-height:56px;
+      border:1.5px solid var(--line);
+      border-radius:16px;
+      padding:0 16px;
+      font-size:1rem;
+      font-weight:600;
+      color:#32403a;
+      background:#fbfbf8;
+      outline:none;
+      margin-bottom:12px;
+    }
+
+    .overlay-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    .overlay-btn{
+      min-height:48px;
+      padding:0 18px;
+      border:none;
+      border-radius:14px;
+      font-size:15px;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    .overlay-btn.primary{
+      background:linear-gradient(135deg,#5c6a62 0%, #748278 100%);
+      color:#fff;
+    }
+
+    .overlay-btn.ghost{
+      background:#f2f4f1;
+      color:#304039;
+    }
+
+    .hidden{
+      display:none !important;
+    }
+
+    .operators-list{
+      margin-top:16px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .operator-item{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:14px;
+      border-radius:16px;
+      background:linear-gradient(180deg,#f9faf7 0%, #f2f4ef 100%);
+      border:1px solid #e0e4df;
+    }
+
+    .operator-item-name{
+      margin:0 0 4px;
+      font-size:15px;
+      font-weight:900;
+    }
+
+    .operator-item-meta{
+      margin:0;
+      color:var(--text-soft);
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .operator-delete{
+      min-height:40px;
+      padding:0 14px;
+      border:none;
+      border-radius:12px;
+      background:#fdf1f1;
+      color:#bb4f4f;
+      font-size:13px;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    @media (max-width: 1100px){
+      .main-grid{
+        grid-template-columns:1fr;
+      }
+
+      .bottom-bar{
+        flex-direction:column;
+        align-items:stretch;
+      }
+
+      .send-btn{
+        width:100%;
+        min-width:0;
+      }
+    }
+
+    @media (max-width: 760px){
+      .page{
+        width:min(100%, calc(100% - 20px));
+        margin:10px auto 22px;
+      }
+
+      .topbar{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+
+      .operator-name{
+        font-size:1.5rem;
+      }
+
+      .content{
+        padding:18px;
+      }
+
+      .client-preview{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+
+      .client-preview-right{
+        text-align:left;
+      }
+
+      .client-search-input{
+        font-size:1.05rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay" id="lockOverlay">
+    <div class="overlay-card">
+      <h2 class="overlay-title" id="lockTitle">Scansiona badge operatore</h2>
+      <p class="overlay-text" id="lockText">
+        Inserisci o scansiona il badge operatore per sbloccare la schermata di accredito punti.
+      </p>
+
+      <div id="lockLoginBox">
+        <input type="text" id="operatorBadgeInput" class="operator-badge-input" placeholder="Badge operatore" autocomplete="off">
+        <div class="overlay-actions">
+          <button class="overlay-btn primary" onclick="unlockWithBadge()">Sblocca</button>
+        </div>
+      </div>
+
+      <div id="firstOperatorBox" class="hidden">
+        <input type="text" id="firstOpNome" class="operator-manage-input" placeholder="Nome operatore">
+        <input type="text" id="firstOpCognome" class="operator-manage-input" placeholder="Cognome operatore">
+        <input type="text" id="firstOpBadge" class="operator-manage-input" placeholder="Badge operatore">
+        <div class="overlay-actions">
+          <button class="overlay-btn primary" onclick="createFirstOperator()">Crea primo operatore</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="operatorsOverlay">
+    <div class="overlay-card" style="width:min(100%, 700px);">
+      <h2 class="overlay-title">Gestione operatori</h2>
+      <p class="overlay-text">
+        Aggiungi o rimuovi gli operatori autorizzati a caricare punti ai clienti.
+      </p>
+
+      <input type="text" id="newOpNome" class="operator-manage-input" placeholder="Nome">
+      <input type="text" id="newOpCognome" class="operator-manage-input" placeholder="Cognome">
+      <input type="text" id="newOpBadge" class="operator-manage-input" placeholder="Badge operatore">
+
+      <div class="overlay-actions">
+        <button class="overlay-btn ghost" onclick="closeOperatorsManager()">Chiudi</button>
+        <button class="overlay-btn primary" onclick="addOperator()">Aggiungi operatore</button>
+      </div>
+
+      <div id="operatorsList" class="operators-list"></div>
+    </div>
+  </div>
+
+  <div class="page">
+    <div class="operator-shell">
+      <div class="topbar">
+        <div class="operator-active">
+          <div class="operator-avatar" id="operatorAvatar">OP</div>
+          <div class="operator-copy">
+            <p class="operator-label">Operatore attivo</p>
+            <h1 class="operator-name" id="operatorName">Nessun operatore attivo</h1>
+            <p class="operator-badge" id="operatorBadgeText">Badge: -</p>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="top-btn" onclick="openOperatorsManager()">Gestione operatori</button>
+          <button class="top-btn" onclick="relockOperator()">Cambio operatore</button>
+          <button class="top-btn" onclick="history.back()">← Indietro</button>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="main-grid">
+          <div class="field-card split-dark">
+            <div class="field-head">Importo speso</div>
+            <div class="field-body">
+              <div class="money-input-wrap">
+                <span class="money-symbol">€</span>
+                <input type="number" id="purchaseAmountInput" class="money-input" placeholder="0,00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+
+          <div class="field-card split-light">
+            <div class="field-head">Punti extra (facoltativi)</div>
+            <div class="field-body">
+              <div class="extra-input-wrap">
+                <input type="number" id="extraPointsInput" class="extra-input" placeholder="0" min="0" step="1">
+                <button class="extra-plus" tabindex="-1">+</button>
+              </div>
+              <input type="text" id="extraReasonInput" class="extra-reason" placeholder="Motivo punti extra (facoltativo)">
+            </div>
+          </div>
+        </div>
+
+        <div class="client-search-card">
+          <div class="client-search-inner">
+            <div class="client-search-icon">🪪</div>
+            <input
+              type="text"
+              id="clientSearchInput"
+              class="client-search-input"
+              placeholder="Scansiona tessera del cliente o cerca cliente..."
+              autocomplete="off"
+            >
+            <button class="client-search-btn" onclick="searchClient()">›</button>
+          </div>
+        </div>
+
+        <div class="client-preview">
+          <div class="client-preview-left">
+            <p class="client-preview-label">Cliente selezionato</p>
+            <h2 class="client-preview-name" id="clientName">Nessun cliente selezionato</h2>
+            <p class="client-preview-meta" id="clientMeta">
+              Scansiona la tessera oppure cerca un cliente nella banca dati locale.
+            </p>
+          </div>
+
+          <div class="client-preview-right">
+            <p class="client-points-label">Punti cliente</p>
+            <p class="client-points-value" id="clientPoints">0</p>
+            <div class="client-level-pill" id="clientLevel">-</div>
+          </div>
+        </div>
+
+        <div class="bottom-bar">
+          <div class="bottom-summary">
+            <div class="summary-item">
+              <span class="summary-label">Punti da acquisto</span>
+              <span class="summary-value" id="purchasePointsValue">0</span>
+            </div>
+
+            <div class="summary-item">
+              <span class="summary-label">Punti extra</span>
+              <span class="summary-value" id="extraPointsValue">0</span>
+            </div>
+
+            <div class="summary-item">
+              <span class="summary-label">Totale punti</span>
+              <span class="summary-value" id="totalPointsValue">0</span>
+            </div>
+          </div>
+
+          <button class="send-btn" onclick="sendPoints()">Invia punti</button>
+        </div>
+
+        <div class="notice warn" id="statusNotice">
+          Inserisci importo, seleziona il cliente e poi invia i punti.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let activeOperator = null;
+    let activeClient = null;
+    let activeClientSource = null;
+
+    function formatNumber(num) {
+      return new Intl.NumberFormat("it-IT").format(Number(num || 0));
+    }
+
+    function normalizeText(value) {
+      return String(value || "").trim();
+    }
+
+    function normalizeCode(value) {
+      return String(value || "").trim().toUpperCase();
+    }
+
+    function calculateLevel(points) {
+      const total = Number(points || 0);
+      if (total >= 3000) return "Diamond";
+      if (total >= 1000) return "Gold";
+      return "Bronze";
+    }
+
+    function calculatePurchasePoints(amount) {
+      const value = Number(amount || 0);
+      if (value <= 0) return 0;
+      return Math.floor(value / 0.5);
+    }
+
+    function getOperators() {
+      try {
+        const raw = localStorage.getItem("farmaciaOperatori");
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveOperators(list) {
+      localStorage.setItem("farmaciaOperatori", JSON.stringify(list));
+    }
+
+    function getOperatorLog() {
+      try {
+        const raw = localStorage.getItem("farmaciaOperatorLog");
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveOperatorLog(list) {
+      localStorage.setItem("farmaciaOperatorLog", JSON.stringify(list));
+    }
+
+    function getMultiClients() {
+      try {
+        const raw = localStorage.getItem("farmaciaClienti");
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveMultiClients(list) {
+      localStorage.setItem("farmaciaClienti", JSON.stringify(list));
+    }
+
+    function getSingleClientData() {
+      try {
+        const profileRaw = localStorage.getItem("farmaciaProfileData");
+        const pointsRaw = localStorage.getItem("farmaciaPuntiData");
+
+        if (!profileRaw) return null;
+
+        const profile = JSON.parse(profileRaw);
+        const pointsData = pointsRaw ? JSON.parse(pointsRaw) : {};
+
+        return { profile, pointsData };
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function updateLockState() {
+      const operators = getOperators();
+      const lockTitle = document.getElementById("lockTitle");
+      const lockText = document.getElementById("lockText");
+      const loginBox = document.getElementById("lockLoginBox");
+      const firstBox = document.getElementById("firstOperatorBox");
+
+      if (!operators.length) {
+        lockTitle.textContent = "Configura il primo operatore";
+        lockText.textContent = "Non ci sono operatori salvati. Crea il primo badge operatore per iniziare.";
+        loginBox.classList.add("hidden");
+        firstBox.classList.remove("hidden");
+      } else {
+        lockTitle.textContent = "Scansiona badge operatore";
+        lockText.textContent = "Inserisci o scansiona il badge operatore per sbloccare la schermata.";
+        loginBox.classList.remove("hidden");
+        firstBox.classList.add("hidden");
+      }
+    }
+
+    function createFirstOperator() {
+      const nome = normalizeText(document.getElementById("firstOpNome").value);
+      const cognome = normalizeText(document.getElementById("firstOpCognome").value);
+      const badge = normalizeCode(document.getElementById("firstOpBadge").value);
+
+      if (!nome || !cognome || !badge) {
+        alert("Compila nome, cognome e badge operatore.");
+        return;
+      }
+
+      const operators = getOperators();
+      if (operators.some(op => normalizeCode(op.badge) === badge)) {
+        alert("Esiste già un operatore con questo badge.");
+        return;
+      }
+
+      operators.push({
+        id: "op_" + Date.now(),
+        nome,
+        cognome,
+        badge,
+        createdAt: new Date().toISOString()
+      });
+
+      saveOperators(operators);
+
+      document.getElementById("firstOpNome").value = "";
+      document.getElementById("firstOpCognome").value = "";
+      document.getElementById("firstOpBadge").value = "";
+
+      updateLockState();
+      renderOperatorsList();
+      alert("Primo operatore creato.");
+    }
+
+    function unlockWithBadge() {
+      const badge = normalizeCode(document.getElementById("operatorBadgeInput").value);
+      if (!badge) {
+        alert("Inserisci il badge operatore.");
+        return;
+      }
+
+      const operator = getOperators().find(op => normalizeCode(op.badge) === badge);
+      if (!operator) {
+        alert("Operatore non riconosciuto.");
+        return;
+      }
+
+      activeOperator = operator;
+      document.getElementById("operatorBadgeInput").value = "";
+      document.getElementById("lockOverlay").classList.add("hidden");
+      renderActiveOperator();
+      document.getElementById("purchaseAmountInput").focus();
+    }
+
+    function relockOperator() {
+      activeOperator = null;
+      activeClient = null;
+      activeClientSource = null;
+      resetForm();
+      document.getElementById("lockOverlay").classList.remove("hidden");
+      updateLockState();
+      renderActiveOperator();
+    }
+
+    function renderActiveOperator() {
+      const avatar = document.getElementById("operatorAvatar");
+      const name = document.getElementById("operatorName");
+      const badge = document.getElementById("operatorBadgeText");
+
+      if (!activeOperator) {
+        avatar.textContent = "OP";
+        name.textContent = "Nessun operatore attivo";
+        badge.textContent = "Badge: -";
+        return;
+      }
+
+      const initials = `${(activeOperator.nome || "O")[0] || "O"}${(activeOperator.cognome || "P")[0] || "P"}`;
+      avatar.textContent = initials.toUpperCase();
+      name.textContent = `${activeOperator.nome} ${activeOperator.cognome}`;
+      badge.textContent = `Badge: ${activeOperator.badge}`;
+    }
+
+    function openOperatorsManager() {
+      document.getElementById("operatorsOverlay").classList.remove("hidden");
+      renderOperatorsList();
+    }
+
+    function closeOperatorsManager() {
+      document.getElementById("operatorsOverlay").classList.add("hidden");
+    }
+
+    function addOperator() {
+      const nome = normalizeText(document.getElementById("newOpNome").value);
+      const cognome = normalizeText(document.getElementById("newOpCognome").value);
+      const badge = normalizeCode(document.getElementById("newOpBadge").value);
+
+      if (!nome || !cognome || !badge) {
+        alert("Compila nome, cognome e badge.");
+        return;
+      }
+
+      const operators = getOperators();
+      if (operators.some(op => normalizeCode(op.badge) === badge)) {
+        alert("Esiste già un operatore con questo badge.");
+        return;
+      }
+
+      operators.push({
+        id: "op_" + Date.now(),
+        nome,
+        cognome,
+        badge,
+        createdAt: new Date().toISOString()
+      });
+
+      saveOperators(operators);
+
+      document.getElementById("newOpNome").value = "";
+      document.getElementById("newOpCognome").value = "";
+      document.getElementById("newOpBadge").value = "";
+
+      renderOperatorsList();
+      updateLockState();
+    }
+
+    function removeOperator(id) {
+      const operators = getOperators().filter(op => op.id !== id);
+      saveOperators(operators);
+      renderOperatorsList();
+      updateLockState();
+    }
+
+    function renderOperatorsList() {
+      const wrap = document.getElementById("operatorsList");
+      const operators = getOperators();
+
+      if (!operators.length) {
+        wrap.innerHTML = `<div class="notice warn">Nessun operatore salvato.</div>`;
+        return;
+      }
+
+      wrap.innerHTML = operators.map(op => `
+        <div class="operator-item">
+          <div>
+            <p class="operator-item-name">${op.nome} ${op.cognome}</p>
+            <p class="operator-item-meta">Badge: ${op.badge}</p>
+          </div>
+          <button class="operator-delete" onclick="removeOperator('${op.id}')">Rimuovi</button>
+        </div>
+      `).join("");
+    }
+
+    function searchClient() {
+      const query = normalizeCode(document.getElementById("clientSearchInput").value);
+      if (!query) {
+        alert("Inserisci o scansiona un cliente.");
+        return;
+      }
+
+      const multiClients = getMultiClients();
+      const foundMulti = multiClients.find(client => {
+        const code = normalizeCode(client.clientId || client.clientCode);
+        const fullName = `${client.name || ""} ${client.surname || ""}`.trim().toUpperCase();
+        return code === query || fullName.includes(query);
+      });
+
+      if (foundMulti) {
+        activeClient = JSON.parse(JSON.stringify(foundMulti));
+        activeClientSource = "multi";
+        renderClient();
+        return;
+      }
+
+      const single = getSingleClientData();
+      if (single && single.profile) {
+        const singleCode = normalizeCode(single.profile.clientId || single.profile.clientCode);
+        const singleName = `${single.profile.name || ""} ${single.profile.surname || ""}`.trim().toUpperCase();
+
+        if (singleCode === query || singleName.includes(query)) {
+          activeClient = {
+            name: single.profile.name || "",
+            surname: single.profile.surname || "",
+            email: single.profile.email || "",
+            phone: single.profile.phone || "",
+            clientId: single.profile.clientId || single.profile.clientCode || "",
+            clientCode: single.profile.clientCode || single.profile.clientId || "",
+            points: Number(single.profile.points ?? single.pointsData.points ?? 0),
+            level: single.profile.level || single.pointsData.level || "Bronze",
+            pointsData: {
+              points: Number(single.pointsData.points ?? single.profile.points ?? 0),
+              level: single.pointsData.level || single.profile.level || "Bronze",
+              nextReward: single.pointsData.nextReward || "Primo premio disponibile",
+              missing: Number(single.pointsData.missing ?? 1000),
+              activities: Array.isArray(single.pointsData.activities) ? single.pointsData.activities : [],
+              operations: Array.isArray(single.pointsData.operations) ? single.pointsData.operations : [],
+              received: Array.isArray(single.pointsData.received) ? single.pointsData.received : []
+            }
+          };
+          activeClientSource = "single";
+          renderClient();
+          return;
+        }
+      }
+
+      alert("Cliente non trovato nella banca dati locale di questo dispositivo.");
+    }
+
+    function renderClient() {
+      const nameEl = document.getElementById("clientName");
+      const metaEl = document.getElementById("clientMeta");
+      const pointsEl = document.getElementById("clientPoints");
+      const levelEl = document.getElementById("clientLevel");
+
+      if (!activeClient) {
+        nameEl.textContent = "Nessun cliente selezionato";
+        metaEl.textContent = "Scansiona la tessera oppure cerca un cliente nella banca dati locale.";
+        pointsEl.textContent = "0";
+        levelEl.textContent = "-";
+        updatePreview();
+        return;
+      }
+
+      const fullName = [activeClient.name, activeClient.surname].filter(Boolean).join(" ").trim() || "Cliente";
+      const points = Number(activeClient.points || 0);
+      const level = activeClient.level || calculateLevel(points);
+      const code = activeClient.clientId || activeClient.clientCode || "-";
+
+      nameEl.textContent = fullName;
+      metaEl.textContent = `${code} · ${activeClient.email || "nessuna email"} · ${activeClient.phone || "nessun telefono"}`;
+      pointsEl.textContent = formatNumber(points);
+      levelEl.textContent = level;
+
+      updatePreview();
+    }
+
+    function updatePreview() {
+      const purchaseAmount = Number(document.getElementById("purchaseAmountInput").value || 0);
+      const extraPoints = Number(document.getElementById("extraPointsInput").value || 0);
+      const extraReason = normalizeText(document.getElementById("extraReasonInput").value);
+
+      const purchasePoints = calculatePurchasePoints(purchaseAmount);
+      const total = purchasePoints + extraPoints;
+
+      document.getElementById("purchasePointsValue").textContent = formatNumber(purchasePoints);
+      document.getElementById("extraPointsValue").textContent = formatNumber(extraPoints);
+      document.getElementById("totalPointsValue").textContent = formatNumber(total);
+
+      const notice = document.getElementById("statusNotice");
+
+      if (!activeOperator) {
+        notice.className = "notice warn";
+        notice.textContent = "Sblocca la schermata con il badge operatore.";
+        return;
+      }
+
+      if (purchaseAmount <= 0 && extraPoints <= 0) {
+        notice.className = "notice warn";
+        notice.textContent = "Inserisci importo speso oppure punti extra.";
+        return;
+      }
+
+      if (!activeClient) {
+        notice.className = "notice warn";
+        notice.textContent = "Seleziona il cliente prima di inviare i punti.";
+        return;
+      }
+
+      if (extraPoints > 0 && !extraReason) {
+        notice.className = "notice warn";
+        notice.textContent = "Hai inserito punti extra: aggiungi anche il motivo.";
+        return;
+      }
+
+      notice.className = "notice ok";
+      notice.textContent = `Operazione pronta: verranno caricati ${formatNumber(total)} punti al cliente.`;
+    }
+
+    function attachListeners() {
+      document.getElementById("purchaseAmountInput").addEventListener("input", updatePreview);
+      document.getElementById("extraPointsInput").addEventListener("input", updatePreview);
+      document.getElementById("extraReasonInput").addEventListener("input", updatePreview);
+
+      document.getElementById("clientSearchInput").addEventListener("keydown", function(e){
+        if (e.key === "Enter") searchClient();
+      });
+
+      document.getElementById("operatorBadgeInput").addEventListener("keydown", function(e){
+        if (e.key === "Enter") unlockWithBadge();
+      });
+    }
+
+    function saveClientUpdate(purchaseAmount, extraPoints, extraReason) {
+      const purchasePoints = calculatePurchasePoints(purchaseAmount);
+      const totalAdded = purchasePoints + extraPoints;
+      const now = new Date();
+      const dateLabel = now.toLocaleString("it-IT");
+
+      if (activeClientSource === "single") {
+        const profileRaw = localStorage.getItem("farmaciaProfileData");
+        const pointsRaw = localStorage.getItem("farmaciaPuntiData");
+
+        const profile = profileRaw ? JSON.parse(profileRaw) : {};
+        const pointsData = pointsRaw ? JSON.parse(pointsRaw) : {};
+
+        const currentPoints = Number(profile.points ?? pointsData.points ?? 0);
+        const newPoints = currentPoints + totalAdded;
+        const newLevel = calculateLevel(newPoints);
+
+        profile.points = newPoints;
+        profile.level = newLevel;
+
+        pointsData.points = newPoints;
+        pointsData.level = newLevel;
+        pointsData.missing = newLevel === "Bronze" ? Math.max(0, 1000 - newPoints)
+                          : newLevel === "Gold" ? Math.max(0, 3000 - newPoints)
+                          : 0;
+        pointsData.activities = Array.isArray(pointsData.activities) ? pointsData.activities : [];
+        pointsData.operations = Array.isArray(pointsData.operations) ? pointsData.operations : [];
+
+        if (purchasePoints > 0) {
+          pointsData.activities.unshift({
+            label: "Acquisto farmacia",
+            points: purchasePoints,
+            date: now.toLocaleDateString("it-IT")
+          });
+
+          pointsData.operations.unshift({
+            icon: "🛒",
+            name: "Acquisto farmacia",
+            meta: `${purchaseAmount.toFixed(2)}€ · ${dateLabel}`,
+            points: purchasePoints
+          });
+        }
+
+        if (extraPoints > 0) {
+          pointsData.activities.unshift({
+            label: extraReason || "Bonus operatore",
+            points: extraPoints,
+            date: now.toLocaleDateString("it-IT")
+          });
+
+          pointsData.operations.unshift({
+            icon: "✨",
+            name: extraReason || "Bonus operatore",
+            meta: `${dateLabel}`,
+            points: extraPoints
+          });
+        }
+
+        localStorage.setItem("farmaciaProfileData", JSON.stringify(profile));
+        localStorage.setItem("farmaciaPuntiData", JSON.stringify(pointsData));
+      }
+
+      if (activeClientSource === "multi") {
+        const clients = getMultiClients();
+        const idx = clients.findIndex(client =>
+          (client.clientId || client.clientCode) === (activeClient.clientId || activeClient.clientCode)
+        );
+
+        if (idx !== -1) {
+          const client = clients[idx];
+          client.points = Number(client.points || 0) + totalAdded;
+          client.level = calculateLevel(client.points);
+          client.activities = Array.isArray(client.activities) ? client.activities : [];
+          client.operations = Array.isArray(client.operations) ? client.operations : [];
+
+          if (purchasePoints > 0) {
+            client.activities.unshift({
+              label: "Acquisto farmacia",
+              points: purchasePoints,
+              date: now.toLocaleDateString("it-IT")
+            });
+
+            client.operations.unshift({
+              icon: "🛒",
+              name: "Acquisto farmacia",
+              meta: `${purchaseAmount.toFixed(2)}€ · ${dateLabel}`,
+              points: purchasePoints
+            });
+          }
+
+          if (extraPoints > 0) {
+            client.activities.unshift({
+              label: extraReason || "Bonus operatore",
+              points: extraPoints,
+              date: now.toLocaleDateString("it-IT")
+            });
+
+            client.operations.unshift({
+              icon: "✨",
+              name: extraReason || "Bonus operatore",
+              meta: `${dateLabel}`,
+              points: extraPoints
+            });
+          }
+
+          clients[idx] = client;
+          saveMultiClients(clients);
+        }
+      }
+    }
+
+    function saveOperatorEntry(purchaseAmount, extraPoints, extraReason) {
+      const purchasePoints = calculatePurchasePoints(purchaseAmount);
+      const total = purchasePoints + extraPoints;
+      const logs = getOperatorLog();
+      const now = new Date();
+
+      const fullClientName = [activeClient.name, activeClient.surname].filter(Boolean).join(" ").trim() || "Cliente";
+
+      logs.unshift({
+        id: "log_" + Date.now(),
+        operatore: `${activeOperator.nome} ${activeOperator.cognome}`,
+        badge: activeOperator.badge,
+        cliente: activeClient.clientId || activeClient.clientCode || "",
+        clienteNome: fullClientName,
+        importo: Number(purchaseAmount || 0),
+        puntiAcquisto: Number(purchasePoints || 0),
+        puntiExtra: Number(extraPoints || 0),
+        totalePunti: Number(total || 0),
+        descrizioneExtra: extraReason || "",
+        dataIso: now.toISOString(),
+        data: now.toLocaleString("it-IT")
+      });
+
+      saveOperatorLog(logs);
+    }
+
+    function sendPoints() {
+      if (!activeOperator) {
+        alert("Operatore non attivo.");
+        return;
+      }
+
+      const purchaseAmount = Number(document.getElementById("purchaseAmountInput").value || 0);
+      const extraPoints = Number(document.getElementById("extraPointsInput").value || 0);
+      const extraReason = normalizeText(document.getElementById("extraReasonInput").value);
+
+      const purchasePoints = calculatePurchasePoints(purchaseAmount);
+      const total = purchasePoints + extraPoints;
+
+      if (purchaseAmount <= 0 && extraPoints <= 0) {
+        alert("Inserisci importo oppure punti extra.");
+        return;
+      }
+
+      if (!activeClient) {
+        alert("Seleziona prima il cliente.");
+        return;
+      }
+
+      if (extraPoints > 0 && !extraReason) {
+        alert("Inserisci il motivo dei punti extra.");
+        return;
+      }
+
+      if (total <= 0) {
+        alert("Totale punti non valido.");
+        return;
+      }
+
+      saveClientUpdate(purchaseAmount, extraPoints, extraReason);
+      saveOperatorEntry(purchaseAmount, extraPoints, extraReason);
+
+      alert(`Punti inviati correttamente: ${formatNumber(total)} punti.`);
+
+      relockOperator();
+    }
+
+    function resetForm() {
+      document.getElementById("purchaseAmountInput").value = "";
+      document.getElementById("extraPointsInput").value = "";
+      document.getElementById("extraReasonInput").value = "";
+      document.getElementById("clientSearchInput").value = "";
+
+      activeClient = null;
+      activeClientSource = null;
+
+      renderClient();
+      updatePreview();
+    }
+
+    updateLockState();
+    attachListeners();
+    renderActiveOperator();
+    renderClient();
+    renderOperatorsList();
+    updatePreview();
+  </script>
+</body>
+</html>

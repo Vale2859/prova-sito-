@@ -1,0 +1,914 @@
+(function () {
+  const isMobile = window.innerWidth <= 768;
+  if (!isMobile) return;
+
+  if (document.documentElement.dataset.mobilePreviewApplied === "true") return;
+  document.documentElement.dataset.mobilePreviewApplied = "true";
+
+  const CONFIG = {
+    phone: "+390835335921",
+    whatsapp: "393927737079",
+    email: "info@farmaciamontesano.it",
+    maps: "https://maps.google.com/?q=Farmacia+Montesano+Matera",
+
+    homeLink: "index.html",
+    serviziLink: "servizi.html",
+    promoLink: "promo.html",
+    beautyLink: "giornate.html",
+    turnoLink: "turno.html",
+    prenotaLink: "giornate.html",
+    miaLink: "assistente.html",
+
+    loginLink: "login.html",
+    registerLink: "register.html",
+    fidelityLink: "fidelity.html",
+    fortunaLink: "fortuna.html",
+    premiLink: "premi.html",
+    profiloLink: "profilo.html",
+
+    heroImage: "farmacia3.jpg",
+
+    cardImages: {
+      servizi: "images/servizi.jpg",
+      promo: "images/promo.jpg",
+      beauty: "images/beauty.jpg",
+      turno: "images/turno.jpg"
+    },
+
+    extraCardImages: {
+      punti: "images/punti.jpg",
+      fortuna: "images/fortuna.jpg",
+      premi: "images/premi.jpg",
+      profilo: "images/profilo.jpg"
+    },
+
+    promoBadge: "1",
+    beautyBadge: "2"
+  };
+
+  const existingLogo = document.querySelector(
+    "header img, .logo img, .navbar-brand img, .brand img, img[alt*='logo' i]"
+  );
+
+  const logoSrc = existingLogo ? existingLogo.getAttribute("src") : "logo.png";
+  const miaSrc = "images/mia.png?v=2";
+
+  const oldStyle = document.getElementById("mobile-preview-style");
+  if (oldStyle) oldStyle.remove();
+
+  const style = document.createElement("style");
+  style.id = "mobile-preview-style";
+  style.textContent = `
+    @media (max-width: 768px) {
+      html, body {
+        overflow-x: hidden !important;
+      }
+
+      body.mobile-preview-mode {
+        background:
+          radial-gradient(circle at top left, rgba(255,255,255,0.92), rgba(244,247,245,0.92)),
+          linear-gradient(180deg, #f4f6f5 0%, #eef3f1 100%) !important;
+        font-family: Inter, Arial, sans-serif !important;
+        padding-bottom: 16px !important;
+        color: #1f4a43;
+      }
+
+      body.mobile-preview-mode *,
+      body.mobile-preview-mode *::before,
+      body.mobile-preview-mode *::after {
+        box-sizing: border-box;
+      }
+
+      body.mobile-preview-mode .mobile-preview-original-hide {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+      }
+
+      body.mobile-preview-mode .mobile-preview-root {
+        width: 100%;
+        max-width: 430px;
+        margin: 0 auto;
+        padding: calc(env(safe-area-inset-top) + 8px) 10px 14px;
+      }
+
+      body.mobile-preview-mode .glass-card {
+        background: rgba(255,255,255,0.78);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 10px 24px rgba(21, 56, 49, 0.08);
+        border: 1px solid rgba(255,255,255,0.55);
+      }
+
+      body.mobile-preview-mode .mobile-preview-topbar {
+        margin-bottom: 8px;
+      }
+
+      body.mobile-preview-mode .mobile-preview-topbar-inner {
+        min-height: 78px;
+        border-radius: 24px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+      }
+
+      body.mobile-preview-mode .mobile-preview-topbar-inner img {
+        display: block;
+        max-width: 150px;
+        width: 100%;
+        height: auto;
+      }
+
+      body.mobile-preview-mode .mobile-preview-statusbar {
+        margin-bottom: 10px;
+      }
+
+      body.mobile-preview-mode .mobile-preview-statusbar-inner {
+        min-height: 52px;
+        border-radius: 18px;
+        padding: 0 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      body.mobile-preview-mode .status-dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #2aa06f;
+        flex: 0 0 14px;
+        box-shadow: 0 0 0 6px rgba(42,160,111,0.10);
+      }
+
+      body.mobile-preview-mode .status-text {
+        min-width: 0;
+        flex: 1;
+        font-size: 14px;
+        line-height: 1.15;
+        font-weight: 800;
+        color: #264d46;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      body.mobile-preview-mode .status-text .light {
+        font-weight: 500;
+        color: #526e68;
+      }
+
+      body.mobile-preview-mode .mobile-preview-hero {
+        display: block;
+        width: 100%;
+        position: relative;
+        min-height: 190px;
+        border-radius: 26px;
+        overflow: hidden;
+        margin-bottom: 10px;
+        box-shadow: 0 14px 28px rgba(21, 56, 49, 0.09);
+        text-decoration: none;
+        color: inherit;
+      }
+
+      body.mobile-preview-mode .mobile-preview-hero-bg {
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(90deg, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.78) 42%, rgba(255,255,255,0.16) 100%),
+          url('${CONFIG.heroImage}') center/cover no-repeat;
+        filter: saturate(0.96) brightness(1.02);
+      }
+
+      body.mobile-preview-mode .mobile-preview-bubble {
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        width: 58%;
+        z-index: 2;
+        background: rgba(255,255,255,0.93);
+        border-radius: 20px;
+        padding: 12px 12px 14px;
+        box-shadow: 0 12px 24px rgba(21,56,49,0.09);
+      }
+
+      body.mobile-preview-mode .mobile-preview-bubble::after {
+        content: "";
+        position: absolute;
+        right: -12px;
+        top: 34px;
+        width: 24px;
+        height: 18px;
+        background: rgba(255,255,255,0.93);
+        border-radius: 0 0 0 18px;
+        transform: skewX(-24deg);
+      }
+
+      body.mobile-preview-mode .mobile-preview-bubble-title {
+        margin: 0 0 8px;
+        font-size: 20px;
+        line-height: 1.02;
+        font-weight: 900;
+        color: #234942;
+      }
+
+      body.mobile-preview-mode .mobile-preview-bubble-subtitle {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.2;
+        font-weight: 500;
+        color: #3c5f58;
+      }
+
+      body.mobile-preview-mode .mobile-preview-mia {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        width: 42%;
+        height: 100%;
+        z-index: 3;
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-end;
+        pointer-events: none;
+      }
+
+      body.mobile-preview-mode .mobile-preview-mia img {
+        display: block;
+        max-height: 96%;
+        width: auto;
+        max-width: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0 10px 18px rgba(0,0,0,0.12));
+      }
+
+      body.mobile-preview-mode .mobile-preview-actions {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      body.mobile-preview-mode .mobile-preview-action {
+        min-height: 48px;
+        border-radius: 999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 0 8px;
+        color: #fff;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 800;
+        box-shadow: 0 10px 20px rgba(21,56,49,0.10);
+      }
+
+      body.mobile-preview-mode .mobile-preview-action .icon {
+        font-size: 16px;
+        line-height: 1;
+      }
+
+      body.mobile-preview-mode .action-call {
+        background: linear-gradient(135deg, #18574f 0%, #2f7b70 100%);
+      }
+
+      body.mobile-preview-mode .action-whatsapp {
+        background: linear-gradient(135deg, #6fa65f 0%, #80c76e 100%);
+      }
+
+      body.mobile-preview-mode .action-book {
+        background: linear-gradient(135deg, #69b5af 0%, #47a9b0 100%);
+      }
+
+      body.mobile-preview-mode .mobile-preview-slider {
+        width: 100%;
+        overflow: hidden;
+      }
+
+      body.mobile-preview-mode .mobile-preview-slider-track {
+        display: flex;
+        width: 100%;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+
+      body.mobile-preview-mode .mobile-preview-slider-track::-webkit-scrollbar {
+        display: none;
+      }
+
+      body.mobile-preview-mode .mobile-preview-slider-page {
+        min-width: 100%;
+        width: 100%;
+        flex: 0 0 100%;
+        scroll-snap-align: start;
+      }
+
+      body.mobile-preview-mode .mobile-preview-slider-page .mobile-preview-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      body.mobile-preview-mode .mobile-preview-card {
+        position: relative;
+        display: block;
+        min-height: 124px;
+        height: 124px;
+        border-radius: 20px;
+        overflow: hidden;
+        text-decoration: none;
+        box-shadow: 0 12px 24px rgba(21,56,49,0.09);
+      }
+
+      body.mobile-preview-mode .mobile-preview-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      body.mobile-preview-mode .mobile-preview-card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.26) 100%);
+      }
+
+      body.mobile-preview-mode .mobile-preview-card-content {
+        position: absolute;
+        left: 12px;
+        right: 12px;
+        bottom: 10px;
+        z-index: 2;
+      }
+
+      body.mobile-preview-mode .mobile-preview-card-title {
+        margin: 0 0 4px;
+        font-size: 18px;
+        line-height: 1.02;
+        font-weight: 900;
+        color: #fff;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.16);
+      }
+
+      body.mobile-preview-mode .mobile-preview-card-text {
+        margin: 0;
+        font-size: 12px;
+        line-height: 1.12;
+        font-weight: 500;
+        color: rgba(255,255,255,0.96);
+        text-shadow: 0 2px 8px rgba(0,0,0,0.14);
+      }
+
+      body.mobile-preview-mode .mobile-preview-badge {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        z-index: 3;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #ff6a84;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: 900;
+        box-shadow: 0 10px 18px rgba(255,106,132,0.28);
+      }
+
+      body.mobile-preview-mode .mobile-preview-dots {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      body.mobile-preview-mode .mobile-preview-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #d9d9d9;
+        transition: all 0.2s ease;
+      }
+
+      body.mobile-preview-mode .mobile-preview-dot.active {
+        background: #6eb8b0;
+        transform: scale(1.08);
+      }
+
+      body.mobile-preview-mode .mobile-preview-bottom-links {
+        display: none;
+      }
+
+      body.mobile-preview-mode .private-access-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(8,20,16,0.64);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        z-index: 999999;
+      }
+
+      body.mobile-preview-mode .private-access-modal.open {
+        display: flex;
+      }
+
+      body.mobile-preview-mode .private-access-modal-card {
+        position: relative;
+        width: min(100%, 390px);
+        background: #ffffff;
+        border-radius: 28px;
+        padding: 22px 18px 18px;
+        box-shadow: 0 24px 48px rgba(0,0,0,0.18);
+        text-align: center;
+      }
+
+      body.mobile-preview-mode .private-access-close {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 40px;
+        height: 40px;
+        border: none;
+        border-radius: 12px;
+        background: #f2f4f3;
+        color: #27443d;
+        font-size: 24px;
+        cursor: pointer;
+      }
+
+      body.mobile-preview-mode .private-access-icon {
+        font-size: 3rem;
+        line-height: 1;
+        margin-bottom: 10px;
+      }
+
+      body.mobile-preview-mode .private-access-title {
+        margin: 0 0 10px;
+        font-size: 1.45rem;
+        line-height: 1;
+        font-weight: 900;
+        letter-spacing: -0.04em;
+        color: #17352f;
+      }
+
+      body.mobile-preview-mode .private-access-text {
+        margin: 0;
+        color: #6c7c76;
+        font-size: 0.98rem;
+        line-height: 1.55;
+        font-weight: 600;
+      }
+
+      body.mobile-preview-mode .private-access-benefits {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 14px;
+        margin-bottom: 16px;
+      }
+
+      body.mobile-preview-mode .private-access-benefit {
+        background: linear-gradient(180deg, #f7fbf9 0%, #f1f8f4 100%);
+        border: 1px solid #dfece6;
+        border-radius: 16px;
+        padding: 11px 12px;
+        color: #17352f;
+        font-size: 0.92rem;
+        line-height: 1.35;
+        font-weight: 700;
+        text-align: left;
+      }
+
+      body.mobile-preview-mode .private-access-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      body.mobile-preview-mode .private-access-btn {
+        min-height: 50px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        font-size: 1rem;
+        font-weight: 900;
+      }
+
+      body.mobile-preview-mode .private-access-btn-login {
+        background: linear-gradient(135deg,#1a8b6c 0%, #58a891 100%);
+        color: #fff;
+      }
+
+      body.mobile-preview-mode .private-access-btn-register {
+        background: #eef3f1;
+        color: #17352f;
+        border: 1px solid #dfe8e4;
+      }
+
+      @media (max-width: 390px) {
+        body.mobile-preview-mode .mobile-preview-root {
+          padding-left: 8px;
+          padding-right: 8px;
+        }
+
+        body.mobile-preview-mode .mobile-preview-topbar-inner {
+          min-height: 72px;
+          border-radius: 22px;
+          padding: 10px 14px;
+        }
+
+        body.mobile-preview-mode .mobile-preview-topbar-inner img {
+          max-width: 138px;
+        }
+
+        body.mobile-preview-mode .mobile-preview-statusbar-inner {
+          min-height: 48px;
+          padding: 0 12px;
+        }
+
+        body.mobile-preview-mode .status-text {
+          font-size: 13px;
+        }
+
+        body.mobile-preview-mode .mobile-preview-hero {
+          min-height: 178px;
+          border-radius: 24px;
+        }
+
+        body.mobile-preview-mode .mobile-preview-bubble {
+          width: 58%;
+          padding: 10px 10px 12px;
+        }
+
+        body.mobile-preview-mode .mobile-preview-bubble-title {
+          font-size: 18px;
+        }
+
+        body.mobile-preview-mode .mobile-preview-bubble-subtitle {
+          font-size: 12px;
+        }
+
+        body.mobile-preview-mode .mobile-preview-action {
+          min-height: 46px;
+          font-size: 12px;
+        }
+
+        body.mobile-preview-mode .mobile-preview-slider-page .mobile-preview-grid {
+          gap: 8px;
+        }
+
+        body.mobile-preview-mode .mobile-preview-card {
+          min-height: 118px;
+          height: 118px;
+          border-radius: 18px;
+        }
+
+        body.mobile-preview-mode .mobile-preview-card-title {
+          font-size: 17px;
+        }
+
+        body.mobile-preview-mode .mobile-preview-card-text {
+          font-size: 11px;
+        }
+      }
+    }
+  `;
+  document.head.appendChild(style);
+
+  document.body.classList.add("mobile-preview-mode");
+
+  Array.from(document.body.children).forEach((child) => {
+    if (
+      child.tagName !== "SCRIPT" &&
+      child.tagName !== "STYLE" &&
+      child.id !== "mobile-preview-root"
+    ) {
+      child.classList.add("mobile-preview-original-hide");
+    }
+  });
+
+  const oldRoot = document.getElementById("mobile-preview-root");
+  if (oldRoot) oldRoot.remove();
+
+  const root = document.createElement("div");
+  root.id = "mobile-preview-root";
+  root.className = "mobile-preview-root";
+
+  root.innerHTML = `
+    <div class="mobile-preview-topbar">
+      <div class="mobile-preview-topbar-inner glass-card">
+        <img src="${logoSrc}" alt="Logo Farmacia Montesano">
+      </div>
+    </div>
+
+    <div class="mobile-preview-statusbar">
+      <div class="mobile-preview-statusbar-inner glass-card">
+        <span class="status-dot" id="mobilePreviewStatusDot"></span>
+        <div class="status-text" id="mobilePreviewStatusText">
+          Siamo aperti <span class="light">| Chiudiamo alle 20:00</span>
+        </div>
+      </div>
+    </div>
+
+    <a href="${CONFIG.miaLink}" class="mobile-preview-hero" aria-label="Apri assistente Mia">
+      <div class="mobile-preview-hero-bg"></div>
+
+      <div class="mobile-preview-bubble">
+        <h2 class="mobile-preview-bubble-title">Ciao, sono MIA❤️❤️</h2>
+        <p class="mobile-preview-bubble-subtitle">Ti aiuto a prenotare<br>esami e servizi in farmacia</p>
+      </div>
+
+      <div class="mobile-preview-mia">
+        <img
+          src="${miaSrc}"
+          alt="MIA assistente farmacia"
+          onerror="this.onerror=null;this.src='mia.png?v=2';this.style.display='block';"
+        >
+      </div>
+    </a>
+
+    <section class="mobile-preview-actions" aria-label="Azioni rapide">
+      <a href="tel:${CONFIG.phone}" class="mobile-preview-action action-call">
+        <span class="icon">📞</span>
+        <span>Chiama</span>
+      </a>
+
+      <a
+        href="https://wa.me/${CONFIG.whatsapp}"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="mobile-preview-action action-whatsapp"
+      >
+        <span class="icon">💬</span>
+        <span>WhatsApp</span>
+      </a>
+
+      <a href="${CONFIG.prenotaLink}" class="mobile-preview-action action-book">
+        <span class="icon">🗓️</span>
+        <span>Prenota</span>
+      </a>
+    </section>
+
+    <section class="mobile-preview-slider" aria-label="Collegamenti rapidi">
+      <div class="mobile-preview-slider-track" id="mobilePreviewSliderTrack">
+
+        <div class="mobile-preview-slider-page">
+          <div class="mobile-preview-grid">
+            <a href="${CONFIG.serviziLink}" class="mobile-preview-card">
+              <img src="${CONFIG.cardImages.servizi}" alt="Servizi">
+              <div class="mobile-preview-card-content">
+                <h3 class="mobile-preview-card-title">Servizi</h3>
+                <p class="mobile-preview-card-text">Esami e consulenze</p>
+              </div>
+            </a>
+
+            <a href="${CONFIG.promoLink}" class="mobile-preview-card">
+              <img src="${CONFIG.cardImages.promo}" alt="Offerte">
+              <span class="mobile-preview-badge">${CONFIG.promoBadge}</span>
+              <div class="mobile-preview-card-content">
+                <h3 class="mobile-preview-card-title">Offerte</h3>
+                <p class="mobile-preview-card-text">Promozioni</p>
+              </div>
+            </a>
+
+            <a href="${CONFIG.beautyLink}" class="mobile-preview-card">
+              <img src="${CONFIG.cardImages.beauty}" alt="Giornate Beauty">
+              <span class="mobile-preview-badge">${CONFIG.beautyBadge}</span>
+              <div class="mobile-preview-card-content">
+                <h3 class="mobile-preview-card-title">Giornate<br>Beauty</h3>
+                <p class="mobile-preview-card-text">Eventi benessere</p>
+              </div>
+            </a>
+
+            <a href="${CONFIG.turnoLink}" class="mobile-preview-card">
+              <img src="${CONFIG.cardImages.turno}" alt="Farmacie di turno">
+              <div class="mobile-preview-card-content">
+                <h3 class="mobile-preview-card-title">Farmacie<br>di turno</h3>
+                <p class="mobile-preview-card-text">Trova la farmacia aperta</p>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <div class="mobile-preview-slider-page">
+          <div class="mobile-preview-grid">
+            <a href="#" class="mobile-preview-card private-card-link" data-private-target="${CONFIG.fidelityLink}">
+              <img
+                src="${CONFIG.extraCardImages.punti}"
+                alt="Fidelity"
+                onerror="this.onerror=null;this.src='images/promo.jpg';"
+              >
+              <div class="mobile-preview-card-content">
+                <h3 class="mobile-preview-card-title">Fidelity</h3>
+                <p class="mobile-preview-card-text">Card e vantaggi</p>
+              </div>
+            </a>
+
+            <a href="#" class="mobile-preview-card private-card-link" data-private-target="${CONFIG.fortunaLink}">
+              <img
+                src="${CONFIG.extraCardImages.fortuna}"
+                alt="Fortuna"
+                onerror="this.onerror=null;this.src='images/promo.jpg';"
+              >
+              <div class="mobile-preview-card-content">
+                <h3 class="mobile-preview-card-title">Fortuna</h3>
+                <p class="mobile-preview-card-text">Gioca oggi</p>
+              </div>
+            </a>
+
+            <a href="#" class="mobile-preview-card private-card-link" data-private-target="${CONFIG.premiLink}">
+              <img
+                src="${CONFIG.extraCardImages.premi}"
+                alt="Premi"
+                onerror="this.onerror=null;this.src='images/promo.jpg';"
+              >
+              <div class="mobile-preview-card-content">
+                <h3 class="mobile-preview-card-title">Premi</h3>
+                <p class="mobile-preview-card-text">Riscatta</p>
+              </div>
+            </a>
+
+            <a href="#" class="mobile-preview-card private-card-link" data-private-target="${CONFIG.profiloLink}">
+              <img
+                src="${CONFIG.extraCardImages.profilo}"
+                alt="Profilo"
+                onerror="this.onerror=null;this.src='images/promo.jpg';"
+              >
+              <div class="mobile-preview-card-content">
+                <h3 class="mobile-preview-card-title">Profilo</h3>
+                <p class="mobile-preview-card-text">I tuoi dati</p>
+              </div>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="mobile-preview-dots" aria-hidden="true">
+        <span class="mobile-preview-dot active"></span>
+        <span class="mobile-preview-dot"></span>
+      </div>
+    </section>
+
+    <div class="private-access-modal" id="privateAccessModal" aria-hidden="true">
+      <div class="private-access-modal-card">
+        <button class="private-access-close" id="privateAccessClose" aria-label="Chiudi">×</button>
+
+        <div class="private-access-icon">🔒</div>
+
+        <h3 class="private-access-title">Accedi per sbloccare questa area</h3>
+
+        <p class="private-access-text">
+          Registrandoti potrai usare la tua card fidelity, accumulare punti, tentare la fortuna,
+          riscattare premi e gestire il tuo profilo cliente.
+        </p>
+
+        <div class="private-access-benefits">
+          <div class="private-access-benefit">🎁 Premi e vantaggi esclusivi</div>
+          <div class="private-access-benefit">★ Card fidelity personale e punti</div>
+          <div class="private-access-benefit">🍀 Un tentativo al giorno nella Fortuna</div>
+        </div>
+
+        <div class="private-access-actions">
+          <a href="${CONFIG.loginLink}" class="private-access-btn private-access-btn-login">Accedi</a>
+          <a href="${CONFIG.registerLink}" class="private-access-btn private-access-btn-register">Registrati</a>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(root);
+
+  const sliderTrack = document.getElementById("mobilePreviewSliderTrack");
+  const sliderDots = document.querySelectorAll(".mobile-preview-dot");
+
+  if (sliderTrack && sliderDots.length) {
+    sliderTrack.addEventListener("scroll", () => {
+      const pageIndex = Math.round(sliderTrack.scrollLeft / sliderTrack.offsetWidth);
+      sliderDots.forEach((dot, index) => {
+        dot.classList.toggle("active", index === pageIndex);
+      });
+    });
+  }
+
+  const privateModal = document.getElementById("privateAccessModal");
+  const privateModalClose = document.getElementById("privateAccessClose");
+  const privateLinks = document.querySelectorAll(".private-card-link");
+
+  function openPrivateModal() {
+    if (!privateModal) return;
+    privateModal.classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closePrivateModal() {
+    if (!privateModal) return;
+    privateModal.classList.remove("open");
+    document.body.style.overflow = "";
+  }
+
+  if (privateModalClose) {
+    privateModalClose.addEventListener("click", closePrivateModal);
+  }
+
+  if (privateModal) {
+    privateModal.addEventListener("click", function (e) {
+      if (e.target === privateModal) {
+        closePrivateModal();
+      }
+    });
+  }
+
+  privateLinks.forEach((link) => {
+    link.addEventListener("click", function (e) {
+      const isLogged = localStorage.getItem("farmaciaLoggedIn");
+      const user = localStorage.getItem("farmaciaCurrentUser");
+      const target = this.getAttribute("data-private-target");
+
+      if (isLogged === "true" && user && target) {
+        window.location.href = target;
+        return;
+      }
+
+      e.preventDefault();
+      openPrivateModal();
+    });
+  });
+
+  (function updateOpeningStatus() {
+    const dot = document.getElementById("mobilePreviewStatusDot");
+    const text = document.getElementById("mobilePreviewStatusText");
+    if (!dot || !text) return;
+
+    const now = new Date();
+    const day = now.getDay();
+    const minutes = now.getHours() * 60 + now.getMinutes();
+
+    let isOpen = false;
+    let message = "Riapriamo domani";
+
+    if (day >= 1 && day <= 5) {
+      const morningOpen = 8 * 60 + 30;
+      const morningClose = 13 * 60;
+      const afternoonOpen = 16 * 60;
+      const afternoonClose = 20 * 60;
+
+      if (minutes >= morningOpen && minutes < morningClose) {
+        isOpen = true;
+        message = "Chiudiamo alle 13:00";
+      } else if (minutes >= afternoonOpen && minutes < afternoonClose) {
+        isOpen = true;
+        message = "Chiudiamo alle 20:00";
+      } else if (minutes >= morningClose && minutes < afternoonOpen) {
+        isOpen = false;
+        message = "Riapriamo oggi alle 16:00";
+      } else if (minutes < morningOpen) {
+        isOpen = false;
+        message = "Apriamo oggi alle 8:30";
+      } else {
+        isOpen = false;
+        message = "Riapriamo domani alle 8:30";
+      }
+    } else if (day === 6) {
+      const saturdayOpen = 8 * 60 + 30;
+      const saturdayClose = 13 * 60;
+
+      if (minutes >= saturdayOpen && minutes < saturdayClose) {
+        isOpen = true;
+        message = "Chiudiamo alle 13:00";
+      } else if (minutes < saturdayOpen) {
+        isOpen = false;
+        message = "Apriamo oggi alle 8:30";
+      } else {
+        isOpen = false;
+        message = "Riapriamo lunedì alle 8:30";
+      }
+    } else {
+      isOpen = false;
+      message = "Riapriamo lunedì alle 8:30";
+    }
+
+    if (isOpen) {
+      dot.style.background = "#2aa06f";
+      dot.style.boxShadow = "0 0 0 6px rgba(42,160,111,0.10)";
+      text.innerHTML = `Siamo aperti <span class="light">| ${message}</span>`;
+    } else {
+      dot.style.background = "#db6b6b";
+      dot.style.boxShadow = "0 0 0 6px rgba(219,107,107,0.10)";
+      text.innerHTML = `Siamo chiusi <span class="light">| ${message}</span>`;
+    }
+  })();
+})();
