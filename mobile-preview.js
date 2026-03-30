@@ -338,6 +338,31 @@
         background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.26) 100%);
       }
 
+
+
+      body.mobile-preview-mode .private-card-link {
+        position: relative;
+      }
+
+      body.mobile-preview-mode .mobile-preview-lock {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 3;
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        background: rgba(255,255,255,0.92);
+        box-shadow: 0 8px 18px rgba(21, 56, 49, 0.12);
+        font-size: 1.15rem;
+      }
+
+      body.mobile-preview-mode .private-card-link.is-unlocked .mobile-preview-lock {
+        display: none;
+      }
+
       body.mobile-preview-mode .mobile-preview-card-content {
         position: absolute;
         left: 12px;
@@ -705,7 +730,7 @@
 
         <div class="mobile-preview-slider-page">
           <div class="mobile-preview-grid">
-            <a href="#" class="mobile-preview-card private-card-link" data-private-target="${CONFIG.fidelityLink}">
+            <a href="#" class="mobile-preview-card private-card-link" data-private-target="${CONFIG.fidelityLink}"><span class="mobile-preview-lock">🔒</span>
               <img
                 src="${CONFIG.extraCardImages.punti}"
                 alt="Fidelity"
@@ -717,7 +742,7 @@
               </div>
             </a>
 
-            <a href="#" class="mobile-preview-card private-card-link" data-private-target="${CONFIG.fortunaLink}">
+            <a href="#" class="mobile-preview-card private-card-link" data-private-target="${CONFIG.fortunaLink}"><span class="mobile-preview-lock">🔒</span>
               <img
                 src="${CONFIG.extraCardImages.fortuna}"
                 alt="Fortuna"
@@ -729,7 +754,7 @@
               </div>
             </a>
 
-            <a href="#" class="mobile-preview-card private-card-link" data-private-target="${CONFIG.premiLink}">
+            <a href="#" class="mobile-preview-card private-card-link" data-private-target="${CONFIG.premiLink}"><span class="mobile-preview-lock">🔒</span>
               <img
                 src="${CONFIG.extraCardImages.premi}"
                 alt="Premi"
@@ -741,7 +766,7 @@
               </div>
             </a>
 
-            <a href="#" class="mobile-preview-card private-card-link" data-private-target="${CONFIG.profiloLink}">
+            <a href="#" class="mobile-preview-card private-card-link" data-private-target="${CONFIG.profiloLink}"><span class="mobile-preview-lock">🔒</span>
               <img
                 src="${CONFIG.extraCardImages.profilo}"
                 alt="Profilo"
@@ -807,6 +832,15 @@
   const privateModal = document.getElementById("privateAccessModal");
   const privateModalClose = document.getElementById("privateAccessClose");
   const privateLinks = document.querySelectorAll(".private-card-link");
+
+  function refreshPrivateCardsState() {
+    const isLogged = localStorage.getItem("farmaciaLoggedIn") === "true";
+    const user = localStorage.getItem("farmaciaCurrentUser");
+    privateLinks.forEach((link) => {
+      link.classList.toggle("is-unlocked", !!(isLogged && user));
+    });
+  }
+  refreshPrivateCardsState();
 
   function openPrivateModal() {
     if (!privateModal) return;
