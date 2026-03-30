@@ -26,7 +26,7 @@
     premiLink: "premi.html",
     profiloLink: "profilo.html",
 
-    heroImage: "farmacia3.jpg",
+    heroImages: ["farmacia2.jpg", "farmacia3.jpg", "farmacia4.jpg"],
 
     cardImages: {
       servizi: "images/servizi.jpg",
@@ -130,6 +130,7 @@
         display: flex;
         align-items: center;
         gap: 10px;
+        overflow: hidden;
       }
 
       body.mobile-preview-mode .status-dot {
@@ -141,21 +142,40 @@
         box-shadow: 0 0 0 6px rgba(42,160,111,0.10);
       }
 
-      body.mobile-preview-mode .status-text {
-        min-width: 0;
-        flex: 1;
+      body.mobile-preview-mode .status-fixed {
+        flex: 0 0 auto;
         font-size: 14px;
         line-height: 1.15;
-        font-weight: 800;
+        font-weight: 900;
         color: #264d46;
         white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
       }
 
-      body.mobile-preview-mode .status-text .light {
-        font-weight: 500;
+      body.mobile-preview-mode .status-marquee {
+        position: relative;
+        min-width: 0;
+        flex: 1;
+        overflow: hidden;
+        white-space: nowrap;
+        mask-image: linear-gradient(to right, transparent 0, black 14px, black calc(100% - 14px), transparent 100%);
+        -webkit-mask-image: linear-gradient(to right, transparent 0, black 14px, black calc(100% - 14px), transparent 100%);
+      }
+
+      body.mobile-preview-mode .status-marquee-track {
+        display: inline-block;
+        padding-left: 100%;
+        font-size: 14px;
+        line-height: 1.15;
+        font-weight: 600;
         color: #526e68;
+        white-space: nowrap;
+        animation: mobileStatusMarquee 12s linear infinite;
+        will-change: transform;
+      }
+
+      @keyframes mobileStatusMarquee {
+        from { transform: translateX(0); }
+        to { transform: translateX(-100%); }
       }
 
       body.mobile-preview-mode .mobile-preview-hero {
@@ -174,34 +194,56 @@
       body.mobile-preview-mode .mobile-preview-hero-bg {
         position: absolute;
         inset: 0;
-        background:
-          linear-gradient(90deg, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.78) 42%, rgba(255,255,255,0.16) 100%),
-          url('${CONFIG.heroImage}') center/cover no-repeat;
+        overflow: hidden;
+      }
+
+      body.mobile-preview-mode .mobile-preview-hero-bg::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        background: linear-gradient(90deg, rgba(255,255,255,0.90) 0%, rgba(255,255,255,0.78) 43%, rgba(255,255,255,0.16) 100%);
+      }
+
+      body.mobile-preview-mode .mobile-preview-hero-slide {
+        position: absolute;
+        inset: 0;
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
         filter: saturate(0.96) brightness(1.02);
+      }
+
+      body.mobile-preview-mode .mobile-preview-hero-slide.is-active {
+        opacity: 1;
       }
 
       body.mobile-preview-mode .mobile-preview-bubble {
         position: absolute;
-        left: 10px;
-        top: 10px;
-        width: 58%;
-        z-index: 2;
-        background: rgba(255,255,255,0.93);
-        border-radius: 20px;
+        left: 14px;
+        top: 14px;
+        width: 57%;
+        z-index: 4;
+        background: rgba(255,255,255,0.95);
+        border-radius: 22px;
         padding: 12px 12px 14px;
         box-shadow: 0 12px 24px rgba(21,56,49,0.09);
+        transform-origin: left top;
       }
 
       body.mobile-preview-mode .mobile-preview-bubble::after {
         content: "";
         position: absolute;
-        right: -12px;
-        top: 34px;
-        width: 24px;
+        right: -10px;
+        top: 50%;
+        margin-top: 6px;
+        width: 22px;
         height: 18px;
-        background: rgba(255,255,255,0.93);
-        border-radius: 0 0 0 18px;
-        transform: skewX(-24deg);
+        background: rgba(255,255,255,0.95);
+        clip-path: polygon(0 0, 100% 50%, 0 100%);
+        transform: rotate(-6deg);
       }
 
       body.mobile-preview-mode .mobile-preview-bubble-title {
@@ -564,7 +606,8 @@
           padding: 0 12px;
         }
 
-        body.mobile-preview-mode .status-text {
+        body.mobile-preview-mode .status-fixed,
+        body.mobile-preview-mode .status-marquee-track {
           font-size: 13px;
         }
 
@@ -574,7 +617,9 @@
         }
 
         body.mobile-preview-mode .mobile-preview-bubble {
-          width: 58%;
+          width: 59%;
+          left: 12px;
+          top: 12px;
           padding: 10px 10px 12px;
         }
 
@@ -642,17 +687,22 @@
     <div class="mobile-preview-statusbar">
       <div class="mobile-preview-statusbar-inner glass-card">
         <span class="status-dot" id="mobilePreviewStatusDot"></span>
-        <div class="status-text" id="mobilePreviewStatusText">
-          Siamo aperti <span class="light">| Chiudiamo alle 20:00</span>
+        <div class="status-fixed" id="mobilePreviewStatusLabel">Siamo aperti</div>
+        <div class="status-marquee">
+          <div class="status-marquee-track" id="mobilePreviewStatusDetail">Chiudiamo alle 20:00 • Chiudiamo alle 20:00 • </div>
         </div>
       </div>
     </div>
 
     <a href="${CONFIG.miaLink}" class="mobile-preview-hero" id="mobilePreviewHero" aria-label="Apri assistente Mia">
-      <div class="mobile-preview-hero-bg"></div>
+      <div class="mobile-preview-hero-bg" id="mobilePreviewHeroBg">
+        <div class="mobile-preview-hero-slide is-active" style="background-image:url('${CONFIG.heroImages[0]}')"></div>
+        <div class="mobile-preview-hero-slide" style="background-image:url('${CONFIG.heroImages[1]}')"></div>
+        <div class="mobile-preview-hero-slide" style="background-image:url('${CONFIG.heroImages[2]}')"></div>
+      </div>
 
       <div class="mobile-preview-bubble" id="mobilePreviewBubble">
-        <h2 class="mobile-preview-bubble-title" id="mobilePreviewBubbleTitle">Ciao, sono MIA❤️❤️</h2>
+        <h2 class="mobile-preview-bubble-title" id="mobilePreviewBubbleTitle">Ciao cliente, sono Mia</h2>
         <p class="mobile-preview-bubble-subtitle" id="mobilePreviewBubbleSubtitle">Ti aiuto a prenotare<br>esami e servizi in farmacia</p>
       </div>
 
@@ -882,6 +932,16 @@
     });
   });
 
+  (function setupMobileHeroSlider() {
+    const slides = Array.from(document.querySelectorAll('.mobile-preview-hero-slide'));
+    if (!slides.length) return;
+    let current = 0;
+    setInterval(function() {
+      slides[current].classList.remove('is-active');
+      current = (current + 1) % slides.length;
+      slides[current].classList.add('is-active');
+    }, 4200);
+  })();
 
   (function setupMobileMiaBubble() {
     const hero = document.getElementById('mobilePreviewHero');
@@ -890,22 +950,36 @@
     const subtitle = document.getElementById('mobilePreviewBubbleSubtitle');
     if (!hero || !bubble || !title || !subtitle) return;
 
-    const isLogged = localStorage.getItem('farmaciaLoggedIn') === 'true';
-    let user = null;
-    try { user = JSON.parse(localStorage.getItem('farmaciaCurrentUser') || 'null'); } catch (e) { user = null; }
-    const firstName = user && (user.name || user.nome) ? String(user.name || user.nome).trim().split(/\s+/)[0] : '';
-    const seenInitial = sessionStorage.getItem('mobileMiaSeenInitial') === 'true';
+    function getUser() {
+      try { return JSON.parse(localStorage.getItem('farmaciaCurrentUser') || 'null'); } catch (e) { return null; }
+    }
 
+    function getFirstName() {
+      const user = getUser();
+      const raw = user && (user.name || user.nome) ? String(user.name || user.nome).trim() : '';
+      return raw ? raw.split(/\s+/)[0] : '';
+    }
+
+    function isLogged() {
+      return localStorage.getItem('farmaciaLoggedIn') === 'true' && !!getUser();
+    }
+
+    const seenInitial = sessionStorage.getItem('mobileMiaSeenInitial') === 'true';
     let hideTimer = null;
+
     function renderMessage(kind) {
+      const firstName = getFirstName();
+      const logged = isLogged();
+
       if (kind === 'return') {
-        title.textContent = isLogged ? `Bentornato ${firstName || 'cliente'} ❤️` : 'Hai bisogno di altro?';
+        title.textContent = logged ? firstName : 'Cliente';
         subtitle.innerHTML = 'Per altri bisogni puoi contattarmi quando vuoi';
       } else {
-        title.textContent = isLogged ? `Ciao ${firstName || 'cliente'}, sono MIA❤️❤️` : 'Ciao, sono MIA❤️❤️';
+        title.textContent = logged ? `Ciao ${firstName}, sono Mia` : 'Ciao cliente, sono Mia';
         subtitle.innerHTML = 'Ti aiuto a prenotare<br>esami e servizi in farmacia';
       }
     }
+
     function showBubble(kind) {
       clearTimeout(hideTimer);
       renderMessage(kind);
@@ -916,6 +990,7 @@
         bubble.style.transform = 'translateY(8px) scale(.98)';
       }, 5000);
     }
+
     bubble.style.transition = 'opacity .28s ease, transform .28s ease';
     bubble.style.opacity = '0';
     bubble.style.transform = 'translateY(8px) scale(.98)';
@@ -946,8 +1021,9 @@
 
   (function updateOpeningStatus() {
     const dot = document.getElementById("mobilePreviewStatusDot");
-    const text = document.getElementById("mobilePreviewStatusText");
-    if (!dot || !text) return;
+    const label = document.getElementById("mobilePreviewStatusLabel");
+    const detail = document.getElementById("mobilePreviewStatusDetail");
+    if (!dot || !label || !detail) return;
 
     const now = new Date();
     const day = now.getDay();
@@ -969,13 +1045,10 @@
         isOpen = true;
         message = "Chiudiamo alle 20:00";
       } else if (minutes >= morningClose && minutes < afternoonOpen) {
-        isOpen = false;
         message = "Riapriamo oggi alle 16:00";
       } else if (minutes < morningOpen) {
-        isOpen = false;
         message = "Apriamo oggi alle 8:30";
       } else {
-        isOpen = false;
         message = "Riapriamo domani alle 8:30";
       }
     } else if (day === 6) {
@@ -986,25 +1059,23 @@
         isOpen = true;
         message = "Chiudiamo alle 13:00";
       } else if (minutes < saturdayOpen) {
-        isOpen = false;
         message = "Apriamo oggi alle 8:30";
       } else {
-        isOpen = false;
         message = "Riapriamo lunedì alle 8:30";
       }
     } else {
-      isOpen = false;
       message = "Riapriamo lunedì alle 8:30";
     }
+
+    label.textContent = isOpen ? "Siamo aperti" : "Siamo chiusi";
+    detail.textContent = `${message} • ${message} • `;
 
     if (isOpen) {
       dot.style.background = "#2aa06f";
       dot.style.boxShadow = "0 0 0 6px rgba(42,160,111,0.10)";
-      text.innerHTML = `Siamo aperti <span class="light">| ${message}</span>`;
     } else {
       dot.style.background = "#db6b6b";
       dot.style.boxShadow = "0 0 0 6px rgba(219,107,107,0.10)";
-      text.innerHTML = `Siamo chiusi <span class="light">| ${message}</span>`;
     }
   })();
 })();
